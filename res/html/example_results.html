@@ -1,0 +1,25 @@
+<html><head><title>Unit Test Results</title>
+<link href="results.css" rel="stylesheet" type="text/css"></head><body>
+<h1>Unit Test Suite Results</h1>
+<p class="intro">The following contains the results of running the test suite. Each fixture has it's own section.  At the top of that section you will see a horizontal rule, followed by the name of the fixture in large, bold type. Below the fixture name will be a line or grid (for many tests) of images. Green images mean that the test passed, while red images mean that the test failed. For each failing test there will be a message below the line (or grid) describing the failure.</p>
+<br><hr><h2>FixedPoint</h2>
+<img src="img/fail.png" /><img src="img/pass.png" /><img src="img/pass.png" /><img src="img/fail.png" />
+
+<table width="100%">
+<tr><td width="25%" class="fn_cell">
+simple.cpp</td><td width="5%" class="info_cell">line 37</td>
+<td width="60%" class="info_cell">fp_num.ToString()=="-1.00000"</td></tr>
+<tr><td colspan="3" valign="top" class="msg_cell"></td></tr>
+</table>
+<table width="100%">
+<tr><td width="25%" class="fn_cell">
+simple.cpp</td><td width="5%" class="info_cell">line 51</td>
+<td width="60%" class="info_cell">fp_num.Set(1000000.0f)</td></tr>
+<tr><td colspan="3" valign="top" class="msg_cell">Expected an exception of type: "std::bad_alloc" but received some other exception.</td></tr>
+</table>
+
+<br><hr><h2>Summary</h2><br>failures=2<br>
+passes=2<br>
+event_count=4<br>
+
+</body></html>

@@ -1,0 +1,7 @@
+UT_INCLUDE_PATH(../../include)
+
+UT_FIXTURE(myFixture)
+ UT_TEST(myTest)
+ 	UT_ASSERT_EQUALS(0,1);
+ UT_TEST_END
+UT_FIXTURE_END

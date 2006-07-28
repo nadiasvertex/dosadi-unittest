@@ -1,0 +1,26 @@
+.fn_cell {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #440000;
+}
+
+
+.info_cell {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	border: thin solid #CCCCCC;
+}
+.msg_cell {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	background-color: #CCCCCC;	
+}
+
+.intro {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;	
+	border: thin dotted #000000;
+	background-color: #cccc00;	
+}

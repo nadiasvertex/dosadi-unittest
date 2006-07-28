@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Inline Unit Tests</title>
+<link href="tutorial.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+ <h2>What are Inline Unit Tests? </h2>
+ <p>If you have ever used doxygen, the idea will be very comfortable for you.</p>
+ <p>Essentially, an inline unit test is just a way of specifying the unit test right in the same body of code that it's implemented in. Like doxygen, the tests are specified by using special keywords inside of comments. You can see an example of that below. </p>
+ <pre> 
+class AFixedPoint /*%startFixture*/
+{
+   /// The fixed-point value.
+   SInt32 fValue;
+   
+   /***** UnitTest Setup and Teardown ***********
+   %{
+     	int *someSetupValue;
+   %}
+   
+   %setup
+   %{
+	  	someSetupValue = new int;
+		*someSetupValue = 0;  
+   %}
+   
+   %teardown
+   %{
+	 	delete someSetupValue;	   
+   %}      
+   **********************************************/
+      
+public:
+   AFixedPoint():fValue(0)
+   {
+      // deliberately empty  
+   }  
+   
+   ~AFixedPoint()
+   {
+      // deliberately empty          
+   }     
+   
+   /// Converts an integer to fixed point.
+   void Set(SInt32 value)
+   {
+      fValue = value<<16;      
+   }
+   
+   /*%test(Set_SInt32)
+     %{
+	
+		AFixedPoint fp_num;
+		
+		fp_num.Set(-1.0f);
+		
+		UT_ASSERT_EQUALS(fp_num.ToString(), "-1.00000");
+				
+	 %} */
+   
+   /// Converts a floating point value to fixed point
+   void Set(float value)
+   {
+	  if (value>65536) throw std::range_error("Float value out of range for 16.16 fixed point.");
+	   
+      fValue = static_cast<UInt32>(value*65536.0 + (value > 0 ? 0.5 : -0.5));  
+   }
+   
+   /*%test(Set_Float)
+	 %{
+		AFixedPoint fp_num;
+	
+		UT_ASSERT_NORESULT_EXCEPTION(fp_num.Set(1000000.0f));
+		UT_EXPECT_EXCEPTION(fp_num.Set(1000000.0f), std::bad_alloc);
+		
+	 %} */
+	 
+}; /*%endFixture*/
+ </pre>
+<p>Notice the keywords prefaced by the '%' character.  Each of those are instances of an inline command for unit tests. It is vital that the %startFixture keyword be on the same line
+as the class name declaration.  If it's not, it won't work properly.  I will be adding another bit of syntax that will just let you specify the name of the fixture for cases where
+you really need to have that be on some other line.  (For example, a class with really complicated inheritance.)  The test framework doesn't need to know about that, though.  So
+long as you put it on the same line, somewhere after the "class _classname_" it will be happy.</p>
+<hr>
+<h2>Advantages and Disadvantages of Inline Unit Tests </h2>
+<p>One of the chief advantages of inline testing over standalone testing, is the ability to see how a function is supposed to be used. That is, the test provides a working example of the function right in the code, where it's easy to see. This can help you in the future when debugging the code, or when someone else is trying to understand how it works. Another advantage is that you can write the code immediately, not having to switch back and forth... so the test might be easier to maintain.</p>
+<p>A disadvantage is that you don't get syntax highlighting for inline tests. Since they have to be inside comments to avoid the compiler from choking on them, they'll appear as a block of something. Another related disadvantage is that you may feel that unit testing code might clutter up the code. Finally, sometimes tests are very complex and require a lot of setup. It may make more sense to write standalone test files for those cases.</p>
+<hr>
+<h2>Inline and Out-of-line Equivalencies</h2>
+<p>Not all Out-of-line directives have inline equivalents.  For many directives, you simply use the UT_XXXX directives in comments.  A good example of this would be UT_INCLUDE or UT_INCLUDE_PATH.  
+Simply putting them inside comments will cause those files to be included in the test code.</p>
+<table width="403">
+  <!--DWLayoutTable-->
+  <tr>
+    <td width="229" height="14" valign="top" class="header">Out of line</td>
+    <td width="147" valign="top" class="header">Inline</td>
+    <td width="5"></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_FIXTURE(fixture_name)</td>
+    <td valign="top" class="table1">%startFixture</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_FIXTURE_END</td>
+    <td valign="top" class="table1">%endFixture</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_TEST(test_name)</td>
+    <td valign="top" class="table1">%test(name)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_TEST_END</td>
+    <td valign="top" class="table1">%}</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_SETUP_FIXTURE</td>
+    <td valign="top" class="table1">%setup</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td height="14" valign="top" class="table1">UT_SETUP_FIXTURE_END</td>
+    <td valign="top" class="table1">%}</td>
+    <td></td>
+  </tr>
+   <tr>
+    <td height="14" valign="top" class="table1">UT_TEARDOWN_FIXTURE</td>
+    <td valign="top" class="table1">%teardown</td>
+    <td></td>
+  </tr>
+   <tr>
+    <td height="14" valign="top" class="table1">UT_TEARDOWN_FIXTURE_END</td>
+    <td valign="top" class="table1">%}</td>
+    <td></td>
+  </tr>  
+  <tr>
+    <td height="14" valign="top" class="table1">embedded code</td>
+    <td valign="top" class="table1">%{ embedded code %}</td>
+    <td></td>
+  </tr>  
+</table>
+<hr>
+<h2>Frequently Asked Questions</h2>
+<p class="question">Q: Can I use the normal Out-of-line directives in a comment block?
+</p>
+<p class="answer">Yes. However, they must occur together, and nothing should occur between them or on the beginning or ending of their lines. For example:</p>
+<pre>
+/*** Unit Test ***
+UT_FIXTURE(myFixture)
+  UT_TEST(myTest)
+  	UT_ASSERT_EQUALS_MSG(true,false,"True is not equal to false!!!");
+  UT_TEST_END
+UT_FIXTURE_END
+*****************/
+</pre>
+<p class="answer">This sort of test block could occur anywhere in your file, though it would probably make the most sense for it to occur at the end.</p>
+<p class="question">Q: How to I generate a unit test from a header file using the inline method? </p>
+<p class="answer">Same way you do with the out-of-line method. Only, instead use the header as the source for the generator:</p>
+<pre>
+python unittest.py mycode.h --build=windows
+test.bat
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>unittest Tutorial</title>
+<link href="tutorial.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1><img src="logo.png" alt="UnitTest" width="256" height="128" /></h1>
+<h1>&nbsp;</h1>
+<h1>Unit Test Tutorial</h1>
+<p>unittest is designed to be a simple-to-use unit-testing framework. It tries to combine the best aspects of CppUnit, CppUnitLite, and CxxUnit, while remaining very lightweight. The framework is designed for C++, and would have to be rebuilt fairly completely to be ported to another language. On the other hand, it should work with any Standard C++ compiler on any operating system. So far it has only been tested under gcc. </p>
+<p>You can find the complete source code documentation <a href="http://dosadi.bbhc.org/darcs/unittest/docs/html/index.html">here</a>: <a href="http://dosadi.bbhc.org/darcs/unittest/docs/html/index.html">http://dosadi.bbhc.org/darcs/unittest/docs/html/index.html</a> Tarball: <a href="../unittest_docs.tar.bz2">unittest_docs.tar.bz2</a> </p>
+<hr />
+<h2>Installing</h2>
+You may get the package using darcs.
+<pre>
+darcs get http://dosadi.bbhc.org/darcs/unittest
+</pre>
+<p>In the repository you will receive the documentation (also found online here), some examples, the unittest script and the unittest framework.</p>
+<p>In order to make the best use of the framework, you can put the script in a reasonable place. This might, for example, be the scripts directory under your python installation. The script is setup with the normal unix hash-bang, so you can just execute it directly from the shell if it's in your path. You might also just want to have a copy of it in the directory where you have all of your tests. It's location is entirely up to you.</p>
+<p>Under the include directory in the repository you will find a directory called &quot;unittest&quot;. This directory must be copied to the default include directory for your compiler, or to some other location that is in your include path. If you wish to keep the framework with your tests, you can simply add the &quot;unittest&quot; directory and it's contents to the include directory for your project. </p>
+<p>Finally, if the unittest framework will always be in the same place relative to your project, you can use the --include-path switch or UT_INCLUDE_PATH directive, and unittest will automatically add that path to the include path for your compiler. e.g.</p>
+<pre>
+python unittest.py --include-path=../../include simple.test
+</pre>
+<p>Or in at least one of your test files:</p>
+<pre>
+UT_INCLUDE_PATH(../../include)
+</pre>
+<p>Note that the path may be any valid path, and does not need to be the one shown.  The only restriction is that the path may not contain a ')' character.</p>
+<hr />
+<h2>Writing a Test </h2>
+<p>One of the most annoying things about writing tests involves the amount of redundant typing that you have to do in order to get the test framework up. Additionally, many test frameworks provide support for suites, but make it complicated to build test suites. unittest makes it easy to do all of these things. Consider the following <a href="http://dosadi.bbhc.org/darcs/unittest/examples/simplest/simplest.test">&quot;simplest possible test&quot;</a>: </p>
+<p>Also see <a href="unittest-inline.html">Inline Tests</a>.</p>
+<pre>
+UT_FIXTURE(myFixture)
+ UT_TEST(myTest)
+ 	UT_ASSERT_EQUALS(0,1);
+ UT_TEST_END
+UT_FIXTURE_END 
+</pre>
+<p>This test will generate a fixture with a single test, plus a suite containing only that fixture. 
+<hr />
+<h2>Building and Running a Test</h2>
+<p>Generating and compiling the test framwork works like this:</p>
+<pre>
+python unittest.py simplest.test
+g++ *.cpp -o simplest.exe
+</pre>
+<p>That's all there is to it.  The unittest.py script generates a .cpp file for each .test file you pass on the command-line.  In addition, it generates a file called test_suite.cpp that contains all the code for registering and running all tests in all fixtures. </p>
+<p>unittest will also generate a build script for you. If you pass --build=unix it will generate a shell script, --build=windows will generate a batch file, and --build=buildfile will generate a buildfile. Buildfiles are useful if you are also using the build framework.</p>
+<pre>
+python unittest.py simplest.test --build=windows
+test.bat
+</pre>
+<p>The name of the build script generated is build_tests.bat for windows and build_tests.sh for unix. For the build framework it is "Buildfile"</p>
+If you run test.bat under examples/simplest in the distribution, you will see the following output:</p>
+<pre>
+f
+
+
+simplest.cpp:18:1: 0==1 failed
+
+
+1 failures
+0 passes
+1 total events
+</pre>
+<p>The single 'f' on the first line indicates that the test failed.  For each test run you will see either an 'f' (for failed) or a '.' (for passed).  Since this example only has one test, and that test is deliberately designed to fail, you get a single failure.</p>
+<p>The next line that has any meaning is the error. You can see the module where the failure occurred, the line number, the column (always one at the moment), and then a message explaining what the failure was. This message is very simple, it just contains the expression and the fact that it failed. As we will see below, you can receive much more sophisticated information.</p>
+<p>Finally, the bottom of the test delivers a summary of the tests. One test failed, no tests passed, and there was one total event. An event is essentially an assertion, but some assertions generate more than one event. For example, assertions that expect an exception will generate two events. One for the assertion expression, and one for the exception. </p>
+<h3>Using the GUI </h3>
+<p>The framework also supports using a GUI to receive output about failed unit tests. The GUI is a GTK+ application, and requires you to have Gtk installed on your platform. So long as that's the case, all you have to do to use it is specify --output=gtk on the command line. Each green box is a unit test that passes, each red one a failure. Detailed information about the failures and sucesses is shown in the list views. </p>
+<p>A passing suite looks like this:</p>
+<p><img src="pass-shot.jpg" width="644" height="434" /> </p>
+<p>On the other hand, a failing test suite will look like this:</p>
+<p><img src="fail-shot.jpg" width="644" height="434" /> </p>
+<p>Those who have developed Gtk applications in the past may know that it can be a pain to find all the proper headers and libraries for the compilation command-line. The Unit Test framework tries to alleviate this burden by doing quite a lot of work to find the correct paths it needs to compile, and the correct libraries to link. These are output for you into the generated build script for your platform. All in the spirit of making your life easier as a developer. </p>
+<hr />
+<h2>More Sophisticated Tests</h2>
+<p>unittest uses macros to allow you to perform sophisticated tests.  Between the UT_TEST() and UT_TEST_END statements you may write any valid C++ code. That code is copied verbatim into the generated file, per test. A test source file may have multiple fixtures, and each fixture can have multiple tests. All fixtures specified on the command line are added into the same suite, and are thus run when that suite is invoked. </p>
+<p>The following assertions are  availble:</p>
+<ul>
+  <li>UT_ASSERT_EQUALS </li>
+  <li>UT_ASSERT_LESS</li>
+  <li>UT_ASSERT_GREATER</li>
+  <li>UT_ASSERT_EXCEPTION</li>
+  <li>UT_ASSERT_NORESULT_EXCEPTION</li>
+  <li>UT_EXPECT_EXCEPTION</li>
+</ul>
+<p>Each of these also has a _MSG counterpart, e.g. UT_ASSERT_EQUALS_MSG. The _MSG counterparts expect a string as the final parameter. That string will be injected in the message sent to the listener, and will be displayed in the output if the assertion fails. </p>
+<h3>Simple Assertions </h3>
+<p>The macros UT_ASSERT_EQUALS, UT_ASSERT_LESS, and UT_ASSERT_GREATER expect two parameters that are the left and right expressions to be evaluated respectively. For example:</p>
+<pre>
+UT_ASSERT_LESS(var_a, var_b);
+UT_ASSERT_LESS_MSG(var_a, var_b, "Variable a is less than variable b.");
+</pre>
+
+<p>If any exceptions are thrown during the execution of the assertion, unittest will fail the assertion and try to gather as much information about the exception as possible. In the case of any &quot;standard&quot; exceptions (i.e. from the STL), you will receive detailed information from the exception. Otherwise you may just receive a message that an unknown exception was caught.</p>
+<h3>Assertions Expecting Exceptions </h3>
+<p>For handling exceptions, we have three macros that are more sophisticated. The first two, UT_ASSERT_EXCEPTION, and UT_ASSERT_NORESULT_EXCEPTION, are similar. They each take one parameter which is the expression to evaluate. The first macro will evaluate the result of the expression and pass or fail on it, as well as if an exception was caught. The second one will only pass or fail if an exception was caught.</p>
+<p>The final macro, UT_EXPECT_EXCEPTION allows you to expect a certain <em>type</em> of exception. This may be any exception type that your program knows of. It takes two parameters. The first is the expression to evaluate (the result is ignored), and the second is the type of exception expected. If the expression evaluation throws the expected type of exception, then the assertion passes. If it does <em>not</em> throw an exception, or if it throws any <em>other</em> kind of exception, the assertion fails. </p>
+<hr />
+<h2>Preprocessing and Advanced Directives</h2>
+<p>
+unittest supports some advanced directives that are useful for writing unit tests in unusual situations.  For example, if you are writing a kernel or a driver and want to test some of the code in userland, the 
+following directives might be of help. These directives <strong>require</strong> the use of the --preprocess command-line switch. </p>
+
+<h3>UT_REPLACE_INCLUDE</h3>
+<p>This particular directive lets you replace #include &lt;&gt; and #include &quot;&quot; directives in the source code. </p>
+<pre>UT_REPLACE_INCLUDE "alloc\.h", "malloc.h"</pre>
+<p>This will replace all instances of the alloc.h header <em>in the source file, and all included source files</em> with malloc.h. If unittest's generator cannot find a source file (e.g. it's not in the
+include path that it knows about) it will simply issue a warning and continue.</P>
+<p>Note the use of the backslash.  unittest uses regular expressions, so the search and replace strings can use all normal Python regular expression constructs.</p>
+<h3>UT_REPLACE_TOKEN</h3>
+
+<p>This is much like UT_REPLACE_INCLUDE, but instead lets you define and regular expression for replacing. It uses the full power of Python's RE module. So, for example:</p>
+<pre>UT_REPLACE_TOKEN "u(\w+\d+)", "U\1"</pre>
+<p>Would replace all occurrences of "uint32" with "Uint32", and "uint8" with "Uint8". This directive operates over the <strong>entire</strong> source, <strong>including</strong> all included files. The replacement is global, so that is something that should be kept in mind when using them.</p>
+<p>A good example of when this could come in handy is testing the hash_table code for a kernel. Say the kernel has two functions: kalloc and kfree, and includes the header alloc.h. In order to test it, you might need to do this:</p>
+<pre>
+// UT_REPLACE_INCLUDE "alloc\.h", "malloc.h"
+// UT_REPLACE_TOKEN   "kalloc", "malloc"
+// UT_REPLACE_TOKEN   "kfree", "free"
+</pre>
+<p>And then at the bottom of the header for your hash table code, put this:</p>
+<pre>
+// UT_INCLUDE("hash_table.c")
+</pre>
+<p>To build the unit test you would do this:</p>
+<pre>
+python unittest.py --preprocess --build=unix hash_table.h
+sh test.sh
+</pre>
+<hr>
+<h2>Frequently Asked Questions</h2>
+<p class="question">Q: What  command-line options are available?</p>
+<ul>
+  <li>--build=[windows,unix,buildfile]</li>
+  <li>--include-path=&lt;path&gt;</li>
+  <li>--output=[compiler,xml,html,gtk]</li>
+  <li>--preprocess</li>
+</ul>
+<p>&nbsp;</p>
+</body>
+</html>

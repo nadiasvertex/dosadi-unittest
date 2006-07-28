@@ -1,0 +1,36 @@
+UT_INCLUDE(FixedPoint.h)
+UT_INCLUDE_PATH(../../include)
+
+UT_FIXTURE(FixedPoint)
+	int *someSetupValue;
+
+	UT_SETUP_FIXTURE
+		someSetupValue = new int;
+		*someSetupValue = 0;
+	UT_SETUP_FIXTURE_END
+	
+	UT_TEARDOWN_FIXTURE
+		delete someSetupValue;
+	UT_TEARDOWN_FIXTURE_END
+	
+	UT_TEST(intConversion)
+	
+		AFixedPoint fp_num;
+		
+		fp_num.Set(-1.0f);
+		
+		UT_ASSERT_EQUALS(fp_num.ToString(), "-1.00000");
+				
+				
+	UT_TEST_END
+	
+	UT_TEST(floatConversion)
+	
+		AFixedPoint fp_num;
+	
+		UT_ASSERT_NORESULT_EXCEPTION(fp_num.Set(1000000.0f));
+		UT_EXPECT_EXCEPTION(fp_num.Set(1000000.0f), std::bad_alloc);
+		
+	UT_TEST_END	
+UT_FIXTURE_END
+	
