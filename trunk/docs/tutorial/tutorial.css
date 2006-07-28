@@ -1,0 +1,27 @@
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #000000;
+	text-align: center;
+}
+.table1 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+.question {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-style: italic;
+	font-weight: bold;
+}
+.answer {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+pre {
+	border: thin dotted #CCCCCC;
+	background-color: #EEEEEE;
+	font-size: 12px;
+}
